@@ -2,15 +2,15 @@ require(mgcv)
 require(rjags)
 require(R2jags)
 require(visreg)
-require(cplm)
 require(ggplot2)
+require(fda)
 source("jagsresults.R")
 #####################
 ## Generating data ##
 #####################
 
 set.seed(42)
-nobs <- 500
+nobs <- 200
 
 sdobsx <- 0.1 
 truex <- sort(rnorm(nobs,0,2)) # true covariate
@@ -30,15 +30,24 @@ dat <- data.frame(x=obsx,y=Y)
 #### End of generating data
 
 
-#basisobj = create.bspline.basis(range(obsx),nbasis=10)
-#bb <- getbasismatrix(obsx, basisobj, nderiv=0)
 
-bb <- gam(rep(1,nobs)~s(sort(obsx),k=10), fit=FALSE)$X
-#bb <- bs(obsx, df=10,intercept=T)
+#Xmat<- gam(rep(1,nobs)~s(sort(obsx),k=10), fit=FALSE)$X
+
+#bks <- quantile(obsx, seq(0, 1, length=50))
+#Bspi <- create.bspline.basis(range(obsx), norder=4,breaks=bks)
+#Xmat <-  getbasismatrix(obsx, basisobj, nderiv=0)
+
+
+Xmat <- bs(obsx, df=10,intercept=T,degree = 3)
+
+
+#xx <- seq(min(obsx),max(obsx),length.out = 200)
+#XXmat <- bs(xx, df=10,intercept=T,degree = 3)
+
 
 jags.dat <- list( n = nobs,
                   y = Y,
-                  X = bb
+                  X = Xmat
                   
 )
 
@@ -63,11 +72,12 @@ for (i in 1:1) { b[i] ~ dnorm(0,0.00011) }
 ## prior for s(x)... 
 for (i in 2:9) { b[i] ~ dnorm(0, lambda[1]) }
 for (i in 10:10) { b[i] ~ dnorm(0, lambda[2]) }
+
 ## smoothing parameter priors CHECK...
 for (i in 1:2) {  
 lambda[i] ~ dgamma(.05,.005)
-#rho[i] <- log(lambda[i])
 }
+
 }"
 
 
