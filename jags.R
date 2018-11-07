@@ -31,8 +31,8 @@ dat <- data.frame(x=obsx,y=Y)
 
 
 
-#Xmat<- gam(rep(1,nobs)~s(sort(obsx),k=10), fit=FALSE)$X
-
+Xmat<- gam(y ~ s(x),data=dat,k=10)
+visreg(Xmat)
 #bks <- quantile(obsx, seq(0, 1, length=50))
 #Bspi <- create.bspline.basis(range(obsx), norder=4,breaks=bks)
 #Xmat <-  getbasismatrix(obsx, basisobj, nderiv=0)
