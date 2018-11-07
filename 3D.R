@@ -25,10 +25,10 @@ m1function <- function(x){
 
 
 m2function <- function(x){
-  f <- (1/2)*exp(-(1/2)*((x-3)^2))
+  f <- (x-3)^2
   return(f)}
 
-par(mfrow=c(1,2))
+par(mfrow=c(2,1))
 plot(X1true,m1function(X1true),type="l")
 plot(X2true,m2function(X2true),type="l")
 
@@ -53,7 +53,9 @@ W2 <- sapply(X2true,rnorm,n=m,sd=sd_u2) #no replicates, m=1
 data_test <- as.data.frame(cbind(Y, X1true, X2true))
 b <- gam(Y~s(X1true,bs="cr",k=15)+s(X2true,bs="cr",k=15),data=data_test,method="REML")
 summary(b)
-par(mfrow=c(2,1))
+par(mfrow=c(2,2))
+plot(X1true,m1function(X1true),type="l")
+plot(X2true,m2function(X2true),type="l")
 plot(b,all.terms=TRUE,scheme=c(2,1))
 
 
@@ -68,7 +70,7 @@ y.pred <- matrix(predict(b, newdata = x1x2,type="response"),
                  nrow = grid.lines, ncol = grid.lines)
 
 
-y.true <- matrix(m1function(x1.pred) + m2function(x2.pred),
+y.true <- matrix(m1function(x1x2$X1true) + m2function(x1x2$X2true),
                  nrow = grid.lines, ncol = grid.lines)
 
 
