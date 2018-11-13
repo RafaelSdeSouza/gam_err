@@ -1,6 +1,7 @@
 library(fda)
 library(mgcv)
 library(Matrix)
+require(visreg)
 require("plot3D")
 
 #####################
@@ -8,15 +9,15 @@ require("plot3D")
 #####################
 
 set.seed(30)
-n <- 1000
+n <- 5000
 m <- 1 ## no replicates 
 k <- 30
 
 GRID <- 200
 
 #=== true X's 
-X1true <- sort(rnorm(n,0,1))
-X2true <- sort(rnorm(n,3,1))
+X1true <- sort(runif(n,-5,5))
+X2true <- sort(runif(n,-8,8))
 
 #=== true functions
 m1function <- function(x){
@@ -25,7 +26,7 @@ m1function <- function(x){
 
 
 m2function <- function(x){
-  f <- (x-3)^2
+  f <- (1/2)*exp(-(1/2)*((x-3)^2))
   return(f)}
 
 par(mfrow=c(2,1))
@@ -56,7 +57,20 @@ summary(b)
 par(mfrow=c(2,2))
 plot(X1true,m1function(X1true),type="l")
 plot(X2true,m2function(X2true),type="l")
-plot(b,all.terms=TRUE,scheme=c(2,1))
+visreg(b)
+
+
+b_rec <- function(obj,N){
+  b <- obj$coefficients[1:N]
+  Q <-  model.matrix(obj)[,1:N]
+  rec <-  rowSums(t(b[1:N]*t(Q[,1:N])))
+  return(rec)
+  }
+
+
+plot(X1true,b_rec(b,5))
+
+#plot(b,all.terms=TRUE,scheme=c(2,1))
 
 
 
