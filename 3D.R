@@ -105,14 +105,6 @@ persp3D(x=x1.pred, y=x2.pred, z= y.pred ,   cex = 1, cex.lab=1.5,type="p",pch = 
           zlab="y")
 
 
-
-
-
-
-
-
-
-
 ### creating B-splines 
 
 create.bsplines.f <- function(knots,range,order){
@@ -164,9 +156,16 @@ beta_estimation <- function(y,DB_matrix, penalty_matrices, alpha){
   diag_term <- bdiag(alpha[1]*penalty_matrices[,,1],alpha[2]*penalty_matrices[,,2]) 
   
   beta <- solve(((t(DB_matrix)%*%DB_matrix)+(diag_term)))%*%t(DB_matrix)%*%y
-  
+ return(beta) 
 }
+
+beta <- beta_estimation(Y,DB_matrix, Penalty_array, alpha) 
 
 fit2 <- B2%*%beta[33:64,1]
 plot(X2true,m2function(X2true))
 lines(X2true,fit2)
+
+
+fit1 <- B2%*%beta[1:32,1]
+plot(X1true,m1function(X1true))
+lines(X1true,fit1)
